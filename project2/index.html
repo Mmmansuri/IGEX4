@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Moment Connection Designer - IGEX4</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔧</text></svg>">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Professional moment connection design tool for structural steel connections">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #d4e8f0 0%, #dde9f5 50%, #d0e4f7 100%);
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 163, 224, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(230, 187, 86, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(0, 212, 255, 0.05) 0%, transparent 30%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Particle container */
+        #particles-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: rgba(0, 163, 224, 0.35);
+            border-radius: 50%;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Menu Styles */
+        #menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(212, 232, 240, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            z-index: 1000;
+            padding: 8px 0;
+            display: flex;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .menu-btns {
+            display: flex;
+            align-items: center;
+            max-width: 1200px;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            margin-right: auto;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            height: 35px;
+            width: auto;
+            margin-right: 12px;
+            mix-blend-mode: multiply;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text .highlight {
+            color: #00A3E0;
+        }
+
+        .menu-btns a {
+            text-decoration: none;
+            color: #333;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 6px 15px;
+            transition: all 0.3s;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .menu-btns a:hover {
+            color: #00A3E0;
+        }
+
+        .menu-btns a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: #00A3E0;
+            transition: width 0.3s;
+        }
+
+        .menu-btns a:hover::after {
+            width: 60%;
+        }
+
+        /* Header Section */
+        #header {
+            margin-top: 80px;
+            padding: 60px 0 40px;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Main Content */
+        #main-content {
+            padding: 40px 0 80px;
+        }
+
+        .design-container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .input-panel, .output-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 2px solid rgba(0, 163, 224, 0.3);
+        }
+
+        .panel-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #00A3E0;
+        }
+
+        .section-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #00A3E0;
+            margin: 20px 0 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 180px 1fr 80px;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .input-group input, .input-group select {
+            padding: 10px 12px;
+            border: 2px solid rgba(0, 163, 224, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #00A3E0;
+            background: white;
+        }
+
+        .input-group .unit {
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #00A3E0, #00D4FF);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: all 0.3s;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,163,224,0.4);
+        }
+
+        .results-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(0, 163, 224, 0.2);
+        }
+
+        .result-card h3 {
+            font-size: 18px;
+            color: #00A3E0;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .result-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .result-value.pass {
+            color: #4CAF50;
+        }
+
+        .result-value.fail {
+            color: #f44336;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .diagram-container canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Footer */
+        #footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 30px 0 15px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .footer-section h3 {
+            font-size: 17px;
+            margin-bottom: 12px;
+            color: #00A3E0;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .footer-section a:hover {
+            color: #00A3E0;
+        }
+
+        .footer-links-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 10px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 15px;
+            border-top: 1px solid #333;
+            color: #999;
+            font-size: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .design-container {
+                grid-template-columns: 1fr;
+            }
+
+            .input-group {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .input-group label {
+                font-weight: 600;
+            }
+
+            .input-group .unit {
+                text-align: left;
+                margin-top: -5px;
+                margin-bottom: 10px;
+            }
+
+            .page-title {
+                font-size: 32px;
+            }
+
+            .input-panel, .output-panel {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Particle Background -->
+<div id="particles-bg"></div>
+
+<!-- Menu -->
+<div id="menu">
+    <div class="menu-btns container">
+        <a href="../index.html" class="logo-container">
+            <img src="../assets/images/logo.png" alt="IGEX4 Logo" class="logo-img">
+            <span class="logo-text">IGEX<span class="highlight">4</span></span>
+        </a>
+        <a href="../index.html#home">Home</a>
+        <a href="../index.html#services">Services</a>
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#technology">Technology</a>
+        <a href="../index.html#why-choose">Why Us</a>
+        <a href="../index.html#cta">Contact</a>
+    </div>
+</div>
+
+<!-- Header -->
+<div id="header">
+    <div class="container">
+        <h1 class="page-title">Moment Connection Designer</h1>
+        <p class="page-subtitle">
+            Professional design tool for bolted moment connections in structural steel frames
+        </p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div id="main-content">
+    <div class="container">
+        <div class="design-container">
+            <!-- Input Panel -->
+            <div class="input-panel">
+                <h2 class="panel-title">Design Parameters</h2>
+                
+                <div class="section-label">Connection Geometry</div>
+                
+                <div class="input-group">
+                    <label>Connection Type:</label>
+                    <select id="connectionType">
+                        <option value="extended">Extended End Plate</option>
+                        <option value="flush">Flush End Plate</option>
+                        <option value="flange">Bolted Flange Plate</option>
+                    </select>
+                    <span class="unit">-</span>
+                </div>
+
+                <div class="input-group">
+                    <label>Beam Size:</label>
+                    <select id="beamSize">
+                        <option value="W24x84">W24x84</option>
+                        <option value="W24x94">W24x94</option>
+                        <option value="W27x94">W27x94</option>
+                        <option value="W30x99">W30x99</option>
+                        <option value="W30x108">W30x108</option>
+                    </select>
+                    <span class="unit">-</span>
+                </div>
+
+                <div class="input-group">
+                    <label>Column Size:</label>
+                    <select id="columnSize">
+                        <option value="W14x120">W14x120</option>
+                        <option value="W14x132">W14x132</option>
+                        <option value="W14x145">W14x145</option>
+                        <option value="W14x159">W14x159</option>
+                    </select>
+                    <span class="unit">-</span>
+                </div>
+
+                <div class="section-label">Material Properties</div>
+                
+                <div class="input-group">
+                    <label>Beam Steel Grade:</label>
+                    <select id="beamSteel">
+                        <option value="50">ASTM A992 (Fy=50 ksi)</option>
+                        <option value="36">ASTM A36 (Fy=36 ksi)</option>
+                        <option value="60">ASTM A913 (Fy=60 ksi)</option>
+                    </select>
+                    <span class="unit">-</span>
+                </div>
+
+                <div class="input-group">
+                    <label>Bolt Grade:</label>
+                    <select id="boltGrade">
+                        <option value="A325">ASTM A325</option>
+                        <option value="A490">ASTM A490</option>
+                    </select>
+                    <span class="unit">-</span>
+                </div>
+
+                <div class="input-group">
+                    <label>Bolt Diameter:</label>
+                    <select id="boltDiameter">
+                        <option value="0.75">3/4"</option>
+                        <option value="0.875">7/8"</option>
+                        <option value="1.0">1"</option>
+                        <option value="1.125">1-1/8"</option>
+                    </select>
+                    <span class="unit">inch</span>
+                </div>
+
+                <div class="section-label">Loading Conditions</div>
+                
+                <div class="input-group">
+                    <label>Factored Moment:</label>
+                    <input type="number" id="moment" value="500" step="10">
+                    <span class="unit">kip-ft</span>
+                </div>
+
+                <div class="input-group">
+                    <label>Factored Shear:</label>
+                    <input type="number" id="shear" value="50" step="5">
+                    <span class="unit">kips</span>
+                </div>
+
+                <div class="input-group">
+                    <label>Factored Axial:</label>
+                    <input type="number" id="axial" value="0" step="5">
+                    <span class="unit">kips</span>
+                </div>
+
+                <button class="calculate-btn" onclick="calculateConnection()">Calculate Design</button>
+            </div>
+
+            <!-- Output Panel -->
+            <div class="output-panel">
+                <h2 class="panel-title">Design Results</h2>
+                
+                <div class="results-grid" id="results">
+                    <div class="result-card">
+                        <h3>📊 Connection Capacity</h3>
+                        <div class="result-item">
+                            <span class="result-label">Moment Capacity (φMn):</span>
+                            <span class="result-value" id="momentCapacity">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Shear Capacity (φVn):</span>
+                            <span class="result-value" id="shearCapacity">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Utilization Ratio:</span>
+                            <span class="result-value" id="utilization">-</span>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>🔩 Bolt Design</h3>
+                        <div class="result-item">
+                            <span class="result-label">Number of Bolts:</span>
+                            <span class="result-value" id="numBolts">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Bolt Tension (per bolt):</span>
+                            <span class="result-value" id="boltTension">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Bolt Shear (per bolt):</span>
+                            <span class="result-value" id="boltShear">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Bolt Check:</span>
+                            <span class="result-value" id="boltCheck">-</span>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>📐 Plate Design</h3>
+                        <div class="result-item">
+                            <span class="result-label">End Plate Thickness:</span>
+                            <span class="result-value" id="plateThickness">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Plate Width:</span>
+                            <span class="result-value" id="plateWidth">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Plate Length:</span>
+                            <span class="result-value" id="plateLength">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Plate Yield Check:</span>
+                            <span class="result-value" id="plateCheck">-</span>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>✅ Design Status</h3>
+                        <div class="result-item">
+                            <span class="result-label">Overall Status:</span>
+                            <span class="result-value" id="overallStatus">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Code Compliance:</span>
+                            <span class="result-value" id="codeCompliance">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="diagram-container">
+                    <canvas id="connectionDiagram" width="600" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div id="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>IGEX4</h3>
+                <p>Intelligent Generative Engineering Execution</p>
+                <p>Expert structural analysis and design solutions for complex engineering projects.</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>Navigation</h3>
+                <div class="footer-links-grid">
+                    <a href="../index.html#home">Home</a>
+                    <a href="../index.html#technology">Technology</a>
+                    <a href="../index.html#services">Services</a>
+                    <a href="../index.html#why-choose">Why Us</a>
+                    <a href="../index.html#projects">Projects</a>
+                    <a href="../index.html#cta">Contact</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            © 2025 IGEX4. All rights reserved.
+        </div>
+    </div>
+</div>
+
+<script>
+function calculateConnection() {
+    // Get input values
+    const connectionType = document.getElementById('connectionType').value;
+    const beamSize = document.getElementById('beamSize').value;
+    const moment = parseFloat(document.getElementById('moment').value);
+    const shear = parseFloat(document.getElementById('shear').value);
+    const boltDia = parseFloat(document.getElementById('boltDiameter').value);
+    const boltGrade = document.getElementById('boltGrade').value;
+    const beamSteelGrade = parseFloat(document.getElementById('beamSteel').value);
+
+    // Beam properties (simplified)
+    const beamDepth = parseFloat(beamSize.split('x')[0].substring(1));
+    
+    // Calculate number of bolts (typically 8-12 for moment connections)
+    const numBolts = connectionType === 'extended' ? 12 : 8;
+    
+    // Bolt capacities
+    const boltArea = Math.PI * Math.pow(boltDia, 2) / 4;
+    const boltTensileStress = boltGrade === 'A325' ? 90 : 113; // ksi
+    const boltShearStress = boltGrade === 'A325' ? 54 : 68; // ksi
+    const phi = 0.75;
+    
+    const boltTensionCapacity = phi * boltTensileStress * boltArea;
+    const boltShearCapacity = phi * boltShearStress * boltArea;
+    
+    // Connection arm (distance from compression flange to tension bolts)
+    const arm = beamDepth - 2; // inches (approximate)
+    
+    // Bolt forces
+    const tensionPerBolt = (moment * 12) / (arm * numBolts/2); // kips
+    const shearPerBolt = shear / numBolts; // kips
+    
+    // Interaction check
+    const boltUtilization = Math.sqrt(Math.pow(tensionPerBolt/boltTensionCapacity, 2) + 
+                                      Math.pow(shearPerBolt/boltShearCapacity, 2));
+    
+    // Moment capacity
+    const momentCapacity = (numBolts/2) * boltTensionCapacity * arm / 12; // kip-ft
+    const shearCapacityTotal = numBolts * boltShearCapacity; // kips
+    
+    // Plate design (simplified)
+    const plateThickness = Math.max(0.75, boltDia + 0.25); // inches
+    const plateWidth = 12; // inches (typical)
+    const plateLength = beamDepth + 6; // inches
+    
+    const plateBending = (tensionPerBolt * 2) / (plateWidth * Math.pow(plateThickness, 2) / 6);
+    const plateYieldStress = beamSteelGrade;
+    const plateUtilization = plateBending / (0.9 * plateYieldStress);
+    
+    // Overall utilization
+    const overallUtilization = Math.max(moment / momentCapacity, shear / shearCapacityTotal);
+    
+    // Update results
+    document.getElementById('momentCapacity').textContent = momentCapacity.toFixed(1) + ' kip-ft';
+    document.getElementById('shearCapacity').textContent = shearCapacityTotal.toFixed(1) + ' kips';
+    document.getElementById('utilization').textContent = (overallUtilization * 100).toFixed(1) + '%';
+    
+    document.getElementById('numBolts').textContent = numBolts + ' bolts';
+    document.getElementById('boltTension').textContent = tensionPerBolt.toFixed(2) + ' kips';
+    document.getElementById('boltShear').textContent = shearPerBolt.toFixed(2) + ' kips';
+    
+    const boltCheckEl = document.getElementById('boltCheck');
+    if (boltUtilization < 1.0) {
+        boltCheckEl.textContent = 'PASS';
+        boltCheckEl.className = 'result-value pass';
+    } else {
+        boltCheckEl.textContent = 'FAIL';
+        boltCheckEl.className = 'result-value fail';
+    }
+    
+    document.getElementById('plateThickness').textContent = plateThickness.toFixed(2) + '"';
+    document.getElementById('plateWidth').textContent = plateWidth.toFixed(1) + '"';
+    document.getElementById('plateLength').textContent = plateLength.toFixed(1) + '"';
+    
+    const plateCheckEl = document.getElementById('plateCheck');
+    if (plateUtilization < 1.0) {
+        plateCheckEl.textContent = 'PASS';
+        plateCheckEl.className = 'result-value pass';
+    } else {
+        plateCheckEl.textContent = 'FAIL';
+        plateCheckEl.className = 'result-value fail';
+    }
+    
+    const statusEl = document.getElementById('overallStatus');
+    if (overallUtilization < 1.0 && boltUtilization < 1.0 && plateUtilization < 1.0) {
+        statusEl.textContent = 'ADEQUATE';
+        statusEl.className = 'result-value pass';
+    } else {
+        statusEl.textContent = 'INADEQUATE';
+        statusEl.className = 'result-value fail';
+    }
+    
+    document.getElementById('codeCompliance').textContent = 'AISC 360-16';
+    
+    // Draw diagram
+    drawConnectionDiagram(connectionType, beamDepth, numBolts, plateLength);
+}
+
+function drawConnectionDiagram(type, beamDepth, numBolts, plateLength) {
+    const canvas = document.getElementById('connectionDiagram');
+    const ctx = canvas.getContext('2d');
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Scale factor
+    const scale = 8;
+    const offsetX = 100;
+    const offsetY = 50;
+    
+    // Draw column (left side)
+    ctx.fillStyle = '#90CAF9';
+    ctx.fillRect(offsetX - 60, offsetY, 60, beamDepth * scale);
+    ctx.strokeStyle = '#1976D2';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(offsetX - 60, offsetY, 60, beamDepth * scale);
+    
+    // Draw end plate
+    ctx.fillStyle = '#FFE082';
+    ctx.fillRect(offsetX - 5, offsetY - 30, 10, plateLength * scale);
+    ctx.strokeStyle = '#F57C00';
+    ctx.strokeRect(offsetX - 5, offsetY - 30, 10, plateLength * scale);
+    
+    // Draw beam
+    ctx.fillStyle = '#A5D6A7';
+    const beamWidth = 150;
+    ctx.fillRect(offsetX + 5, offsetY + beamDepth * scale / 2 - 20, beamWidth, 40);
+    ctx.strokeStyle = '#388E3C';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(offsetX + 5, offsetY + beamDepth * scale / 2 - 20, beamWidth, 40);
+    
+    // Draw beam flanges
+    ctx.fillRect(offsetX + 5, offsetY + 10, beamWidth, 15);
+    ctx.strokeRect(offsetX + 5, offsetY + 10, beamWidth, 15);
+    ctx.fillRect(offsetX + 5, offsetY + beamDepth * scale - 25, beamWidth, 15);
+    ctx.strokeRect(offsetX + 5, offsetY + beamDepth * scale - 25, beamWidth, 15);
+    
+    // Draw bolts
+    ctx.fillStyle = '#757575';
+    const boltsPerRow = numBolts / 4;
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < boltsPerRow; j++) {
+            const x = offsetX;
+            const y = offsetY + 20 + (i * (beamDepth * scale - 40) / 3);
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.strokeStyle = '#424242';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+    }
+    
+    // Add labels
+    ctx.fillStyle = '#000';
+    ctx.font = '14px Arial';
+    ctx.fillText('Column', offsetX - 50, offsetY - 10);
+    ctx.fillText('End Plate', offsetX + 15, offsetY - 35);
+    ctx.fillText('Beam', offsetX + beamWidth / 2, offsetY + beamDepth * scale / 2);
+    
+    // Draw moment arrow
+    ctx.strokeStyle = '#D32F2F';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(offsetX + beamWidth + 100, offsetY + beamDepth * scale / 2, 40, 0, 1.5 * Math.PI);
+    ctx.stroke();
+    
+    // Arrow head
+    ctx.beginPath();
+    ctx.moveTo(offsetX + beamWidth + 100, offsetY + beamDepth * scale / 2 - 40);
+    ctx.lineTo(offsetX + beamWidth + 90, offsetY + beamDepth * scale / 2 - 50);
+    ctx.lineTo(offsetX + beamWidth + 110, offsetY + beamDepth * scale / 2 - 50);
+    ctx.closePath();
+    ctx.fillStyle = '#D32F2F';
+    ctx.fill();
+    
+    ctx.fillStyle = '#D32F2F';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText('M', offsetX + beamWidth + 140, offsetY + beamDepth * scale / 2);
+}
+
+// Initial calculation on page load
+window.addEventListener('load', function() {
+    calculateConnection();
+    
+    // Create floating particles
+    const particlesContainer = document.getElementById('particles-bg');
+    const particleCount = 60;
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + 'vh';
+        particle.style.animationDelay = Math.random() * 20 + 's';
+        particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+        particlesContainer.appendChild(particle);
+    }
+});
+</script>
+
+</body>
+</html>
