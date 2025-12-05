@@ -186,6 +186,37 @@
             color: #00A3E0;
         }
 
+        /* Hamburger menu button - hidden on desktop */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #333;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
         .menu-btns a {
             text-decoration: none;
             color: #333;
@@ -1066,20 +1097,42 @@
         /* Responsive */
         @media (max-width: 768px) {
             #menu {
-                padding: 6px 0;
+                padding: 10px 0;
+            }
+
+            .menu-btns {
+                flex-wrap: wrap;
+                position: relative;
+            }
+
+            .hamburger {
+                display: flex;
+                margin-left: auto;
             }
             
-            .menu-btns a {
-                font-size: 13px;
-                padding: 5px 8px;
+            .menu-btns a:not(.logo-container) {
+                display: none;
+                width: 100%;
+                text-align: center;
+                padding: 12px 15px;
+                border-bottom: 1px solid rgba(0, 163, 224, 0.1);
+                font-size: 15px;
+            }
+
+            .menu-btns.active a:not(.logo-container) {
+                display: block;
+            }
+
+            .menu-btns a::after {
+                display: none;
             }
 
             .logo-img {
-                height: 28px;
+                height: 30px;
             }
 
             .logo-text {
-                font-size: 16px;
+                font-size: 18px;
             }
 
             #home {
@@ -1391,11 +1444,16 @@
 
 <!-- Menu -->
 <div id="menu">
-    <div class="menu-btns container">
+    <div class="menu-btns container" id="menuBtns">
         <a href="#home" class="logo-container">
             <img src="./assets/images/logo.png" alt="IGEX4 Logo" class="logo-img">
             <span class="logo-text">IGEX<span class="highlight">4</span></span>
         </a>
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
         <a href="#home" class="menu-btn click">Home</a>
         <a href="#services" class="menu-btn click">Services</a>
         <a href="#projects" class="menu-btn click">Projects</a>
@@ -2029,6 +2087,26 @@
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Hamburger menu toggle
+        const hamburger = document.getElementById('hamburger');
+        const menuBtns = document.getElementById('menuBtns');
+        
+        if (hamburger) {
+            hamburger.addEventListener('click', function() {
+                hamburger.classList.toggle('active');
+                menuBtns.classList.toggle('active');
+            });
+
+            // Close menu when clicking on a menu item
+            const menuLinks = document.querySelectorAll('.menu-btn');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    hamburger.classList.remove('active');
+                    menuBtns.classList.remove('active');
+                });
+            });
+        }
+
         // Hide loading screen
         setTimeout(() => {
             document.getElementById('fullLoading').style.display = 'none';
